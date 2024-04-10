@@ -7,6 +7,8 @@ int main() {
         Matrix mat1(2, 3);
         Matrix mat2(2, 3);
         Matrix mat3(3, 2);
+        Matrix mat4(3, 3);
+        Matrix detZeroMat(3, 3);
 
         // Заполняем матрицы
         for (int i = 0; i < mat1.GetRows(); ++i) {
@@ -27,6 +29,27 @@ int main() {
             }
         }
         
+        mat4[0][0] = 1;
+        mat4[0][1] = 4;
+        mat4[0][0] = 3;
+        mat4[1][0] = 2;
+        mat4[1][1] = 1;
+        mat4[1][2] = 5;
+        mat4[2][0] = 3;
+        mat4[2][1] = 2;
+        mat4[2][2] = 1;
+        
+        detZeroMat[0][0] = 1;
+        detZeroMat[0][1] = 4;
+        detZeroMat[0][2] = 2;
+        detZeroMat[1][0] = 1;
+        detZeroMat[1][1] = 4;
+        detZeroMat[1][2] = 2;
+        detZeroMat[2][0] = 3;
+        detZeroMat[2][1] = 9;
+        detZeroMat[2][2] = 5;
+        
+        // Матрицы для тестирования
         Matrix testMat1(2, 3);
         for (int i = 0; i < testMat1.GetRows(); ++i) {
             for (int j = 0; j < testMat1.GetCols(); ++j) {
@@ -120,9 +143,33 @@ int main() {
             std::cout << "\nFAILED matrix transposition test." << std::endl;
         }
         
-        std::cout << "\nPASSED " << countPassedTests << " tests of 5." << std::endl;
-
-    } catch (const std::exception& e) {
+        Matrix invMat4 = mat4.InverseMatrix();
+        std::cout << "Inversed Matrix 4:\n";
+        invMat4.Display();
+        std::cout << "\nPASSED matrix inversion test." << std::endl;
+        countPassedTests++;
+        
+        std::cout << "\nMatrix 4 determinant: " << mat4.Determinant() << "\n\n";
+        std::cout << "\nPASSED calculate determinant test." << std::endl;
+        countPassedTests++;
+        
+        Matrix calcComplMat = mat4.CalcComplements();
+        std::cout << "Calculated compliments matrix for Matrix 4:\n";
+        calcComplMat.Display();
+        std::cout << "\nPASSED calculate compliments test." << std::endl;
+        countPassedTests++;
+        
+        std::cout << "detZeroMat determinant: " << detZeroMat.Determinant() << "\n\n";
+        std::cout << "\nPASSED calculate determinant test." << std::endl;
+        countPassedTests++;
+        
+        Matrix invDetZeroMat = detZeroMat.InverseMatrix();
+        invDetZeroMat.Display();
+        std::cout << "\nFAILED matrix inversion test." << std::endl;
+        
+        std::cout << "\nPASSED " << countPassedTests << " tests of 10." << std::endl;
+        
+        } catch (const std::exception& e) {
         std::cerr << "Exception: " << e.what() << std::endl;
     }
 
