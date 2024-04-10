@@ -1,6 +1,11 @@
 #include "matrix_oop.h"
 #include <iostream>
 #include <stdexcept>
+#include <iomanip>
+#include <vector>
+#include <algorithm>
+
+using namespace std;
 
 Matrix::Matrix(): rows_(0), cols_(0), matrix_(nullptr) {}
 
@@ -214,23 +219,91 @@ Matrix Matrix::Transpose() const {
 
 // Оператор вычисления дополнений
 Matrix Matrix::CalcComplements() const {
-    // ...
+    Matrix result(rows_ -1, cols_ -1);
 
-    return Matrix();
+    if (rows_ != cols_) cerr << "Matrix is not square.";
+
+    Matrix calc(rows_, cols_);
+    int current_rows_result, current_cols_result;
+    for (int current_rows = 0; current_rows < rows_; ++current_rows)
+        for (int current_cols = 0; current_cols < cols_; ++current_cols) {
+            current_rows_result = 0;
+            current_cols_result = 0;
+            for (int i = 0; i < rows_; ++i)
+                for (int j = 0; j < cols_; ++j) {
+                    if (j == current_cols || i == current_rows) {
+                        continue;
+                    } else {
+                        result.matrix_[current_rows_result][current_cols_result] = matrix_[i][j];
+                        if (current_cols_result == result.GetCols() - 1) {
+                            current_rows_result++;
+                            current_cols_result = 0;
+                        } else {
+                            current_cols_result++;
+                        }
+                    }
+                }
+            calc.matrix_[current_rows][current_cols] = result.Determinant();
+        }
+    for (int i = 0; i < rows_; i++)
+        for (int j = 0; j < cols_; j++) {
+            if (j % 2 == 1 && i % 2 == 0) {
+                calc.matrix_[i][j] *= -1;
+            } else if (j % 2 == 0 && i % 2 == 1) {
+                calc.matrix_[i][j] *= -1;
+            }
+        }
+    return calc;
 }
 
 // Оператор вычисления определителя
 double Matrix::Determinant() const {
-    // ...
+    if (rows_ != cols_) { cerr << "Matrix is not square.\n"; }
 
-    return 0.0;
+    vector<vector<int>> matrixData(rows_, vector<int>(cols_));
+    for (int i = 0; i < rows_; ++i) {
+        for (int j = 0; j < cols_; ++j) {
+            matrixData[i][j] = matrix_[i][j];
+        }
+    }
+
+    int n = matrixData.size();
+
+    vector<int> permutation(n);
+    for (int i = 0; i < n; ++i) {
+        permutation[i] = i;
+    }
+
+    double det = 0;
+    do {
+        int term = 1;
+        for (int i = 0; i < n; ++i) {
+            term *= matrixData[i][permutation[i]];
+        }
+
+        int sign = 1;
+        for (int i = 0; i < n; ++i) {
+            for (int j = i + 1; j < n; ++j) {
+                if (permutation[i] > permutation[j]) {
+                    sign *= -1;
+                }
+            }
+        }
+        det += sign * term;
+    } while (std::next_permutation(permutation.begin(), permutation.end()));
+
+    return det;
 }
 
 // Оператор вычисления обратной матрицы
 Matrix Matrix::InverseMatrix() const {
-    // ...
-
-    return Matrix();
+    bool flag = true;
+    if (rows_ != cols_) {
+        cerr << "Matrix is not square.";
+        flag = false;
+    }
+    if (flag) return CalcComplements().Transpose() * (1.0 / Determinant());
+    else return Matrix();
 }
 
 int Matrix::GetRows() const {
